@@ -8,6 +8,12 @@ This is a Python implementation of how to project point cloud from Velodyne coor
 matplotlib == 3.1.3
 numpy == 1.18.1
 ```
+
+Also tested with
+```
+matplotlib == 3.4.3
+numpy == 1.23.5
+```
 ## Usage
 Download KITTI dataset and place `proj_velo2cam.py` in the root path.
 CLI is also supported, e.g. run with frame 000999
