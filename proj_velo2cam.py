@@ -2,7 +2,9 @@ import sys
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import numpy as np
+import time
 
+start_time = time.time()
 sn = int(sys.argv[1]) if len(sys.argv)>1 else 7 #default 0-7517
 name = '%06d'%sn # 6 digit zeropadding
 img = f'./data_object_image_2/testing/image_2/{name}.png'
@@ -11,12 +13,12 @@ with open(f'./testing/calib/{name}.txt','r') as f:
     calib = f.readlines()
 
 # P2 (3 x 4) for left eye
-P2 = np.matrix([float(x) for x in calib[2].strip('\n').split(' ')[1:]]).reshape(3,4)
-R0_rect = np.matrix([float(x) for x in calib[4].strip('\n').split(' ')[1:]]).reshape(3,3)
+P2 = np.array([float(x) for x in calib[2].strip('\n').split(' ')[1:]]).reshape(3,4)
+R0_rect = np.array([float(x) for x in calib[4].strip('\n').split(' ')[1:]]).reshape(3,3)
 # Add a 1 in bottom-right, reshape to 4 x 4
 R0_rect = np.insert(R0_rect,3,values=[0,0,0],axis=0)
 R0_rect = np.insert(R0_rect,3,values=[0,0,0,1],axis=1)
-Tr_velo_to_cam = np.matrix([float(x) for x in calib[5].strip('\n').split(' ')[1:]]).reshape(3,4)
+Tr_velo_to_cam = np.array([float(x) for x in calib[5].strip('\n').split(' ')[1:]]).reshape(3,4)
 Tr_velo_to_cam = np.insert(Tr_velo_to_cam,3,values=[0,0,0,1],axis=0)
 
 # read raw data from binary
@@ -25,10 +27,12 @@ points = scan[:, 0:3] # lidar xyz (front, left, up)
 # TODO: use fov filter? 
 velo = np.insert(points,3,1,axis=1).T
 velo = np.delete(velo,np.where(velo[0,:]<0),axis=1)
-cam = P2 * R0_rect * Tr_velo_to_cam * velo
-cam = np.delete(cam,np.where(cam[2,:]<0)[1],axis=1)
+cam = P2.dot(R0_rect.dot(Tr_velo_to_cam.dot(velo)))
+cam = np.delete(cam,np.where(cam[2,:]<0),axis=1)
 # get u,v,z
 cam[:2] /= cam[2,:]
+end_time = time.time()
+print(end_time - start_time)
 # do projection staff
 plt.figure(figsize=(12,5),dpi=96,tight_layout=True)
 png = mpimg.imread(img)
