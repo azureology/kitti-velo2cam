@@ -2,9 +2,7 @@ import sys
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import numpy as np
-import time
 
-start_time = time.time()
 sn = int(sys.argv[1]) if len(sys.argv)>1 else 7 #default 0-7517
 name = '%06d'%sn # 6 digit zeropadding
 img = f'./data_object_image_2/testing/image_2/{name}.png'
@@ -31,8 +29,6 @@ cam = P2.dot(R0_rect.dot(Tr_velo_to_cam.dot(velo)))
 cam = np.delete(cam,np.where(cam[2,:]<0),axis=1)
 # get u,v,z
 cam[:2] /= cam[2,:]
-end_time = time.time()
-print(end_time - start_time)
 # do projection staff
 plt.figure(figsize=(12,5),dpi=96,tight_layout=True)
 png = mpimg.imread(img)
